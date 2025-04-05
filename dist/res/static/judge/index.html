@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <meta content="IE=edge,chrome=1" http-equiv=X-UA-Compatible>
-    <meta content=webkit name=renderer>
+    <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+    <meta content="webkit" name="renderer">
 
     <title>dAiv - Online Judge</title>
     <link rel="shortcut icon" href="/dist/res/image/favicon.ico">
+    <link href="/dist/src/main/judge/loader.css" rel="stylesheet">
 
     <!-- Bootstrap Assets -->
     <script src="/cdn/bootstrap/5.3.2/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
@@ -23,20 +24,29 @@
     <script type="text/javascript" src="/cdn/brython/3.11.3/brython_stdlib.js" crossorigin="anonymous"></script>
 
     <!-- Page Scripting -->
-    <script type="text/python" src="/dist/src/main/judge/judge.py"></script>
+    <!-- <script type="text/python" src="/dist/src/main/judge/judge.py"></script> -->
     <link href="/dist/src/main/judge/judge.css" rel="stylesheet">
-
-
-    <meta http-equiv="refresh" content="0; url=http://168.188.128.102/"/>
+    <link href="/dist/src/main/judge/vendor.css" rel="stylesheet">
+    <link href="/dist/src/main/judge/oj.css" rel="stylesheet">
 </head>
 <body onload="brython()">
-    <section id="judge">
-        <iframe id="judge_iframe" src="https://daiv.ddns.net/"
-                sandbox="allow-same-origin allow-scripts allow-top-navigation"
-                root_url="https://daiv.ddns.net/"></iframe>
-    </section>
+    <div id="app-loader">
+        <div class=square></div>
+        <div class=square></div>
+        <div class="square last"></div>
+        <div class="square clear"></div>
+        <div class=square></div>
+        <div class="square last"></div>
+        <div class="square clear"></div>
+        <div class=square></div>
+        <div class="square last"></div>
+    </div>
+    <div id="app">
 
-    <p>만약 리다이렉트가 작동하지 않는다면, <a href="http://168.188.128.102/">여기</a>를 클릭하세요.</p>
-    <p>Powered by 딥 챌린지 랩</p>
+    </div>
+    <script type="text/javascript" src="/dist/src/main/judge/vendor.dll.js" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="/dist/src/main/judge/manifest.js" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="/dist/src/main/judge/vendor.js" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="/dist/src/main/judge/oj.js" crossorigin="anonymous"></script>
 </body>
 </html>
