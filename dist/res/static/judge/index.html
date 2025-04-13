@@ -80,6 +80,18 @@
                     --bs-text-opacity: 1;
                     --bs-secondary-color: rgba(33, 37, 41, 0.75);
                 }
+
+                .online-judge-page-footer-container {
+                    background: #7d8592 !important;
+                }
+
+                .online-judge-page-footer {
+                    fill: #7d8592 !important;
+                }
+
+                .online-judge-page-footer text {
+                    color: #7d8592 !important;
+                }
             </style>
             <link href="/cdn/bootstrap/5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
             <link href="/dist/res/css/style.css" rel="stylesheet">
@@ -93,6 +105,8 @@
 
         // Remove Back to Top Button from Footer (Use Judge's Back to Top Button instead)
         shadow.getElementById('btn-back-to-top').remove();
+        shadow.getElementById('footer').classList.add('online-judge-page-footer-container');
+        shadow.getElementById('footer').getElementsByClassName('bi-discord')[0].classList.add('online-judge-page-footer');
     </script>
 </body>
 </html>
