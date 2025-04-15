@@ -8,16 +8,7 @@
 
     <title>OnlineJudge</title>
     <link rel="shortcut icon" href="/dist/res/image/favicon.ico">
-    <link href="/dist/src/main/judge/loader.css" rel="stylesheet">
 
-    <!-- Style Setting -->
-    <link href="/dist/res/css/font.css" rel="stylesheet">
-
-    <!-- Page Scripting -->
-    <script type="text/python" src="/dist/src/main/judge/judge.py"></script>
-    <link href="/dist/src/main/judge/judge.css" rel="stylesheet">
-    <link href="/dist/src/main/judge/vendor.css" rel="stylesheet">
-    <link href="/dist/src/main/judge/oj.css" rel="stylesheet">
     <script>
         const redirectPath = sessionStorage.getItem('redirect-path');
         if (redirectPath) {  // if page is refreshed
@@ -26,87 +17,58 @@
             window.history.replaceState(null, null, redirectPath);
         }
     </script>
+
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+        }
+        #frame-container {
+            width: 100%;
+            height: 100vh;
+            border: none;
+        }
+    </style>
 </head>
 <body>
-    <div id="app-loader">
-        <div class=square></div>
-        <div class=square></div>
-        <div class="square last"></div>
-        <div class="square clear"></div>
-        <div class=square></div>
-        <div class="square last"></div>
-        <div class="square clear"></div>
-        <div class=square></div>
-        <div class="square last"></div>
-    </div>
-    <section id="vue" class="appview">
-        <div id="app"></div>
-    </section>
-    <script type="text/javascript" src="/dist/src/main/judge/vendor.dll.js" crossorigin="anonymous"></script>
-    <script type="text/javascript" src="/dist/src/main/judge/manifest.js" crossorigin="anonymous"></script>
-    <script type="text/javascript" src="/dist/src/main/judge/vendor.js" crossorigin="anonymous"></script>
-    <script type="text/javascript" src="/dist/src/main/judge/oj.js" crossorigin="anonymous"></script>
+    <iframe id="frame-container" src="https://dAiv-CNU.duckdns.org/judge/index.html" sandbox="allow-same-origin allow-scripts allow-popups allow-forms"></iframe>
+    <script>
+        const iframe = document.getElementById('frame-container');
 
-    <section id="footer-container"></section>
-    <script type="module">
-        function insertElement(htmlstr, parent, index = -1) {
-            htmlstr = htmlstr.replace(/{CURRENT_YEAR}/g, `${currentYear}`);
-
-            const element = parseHtml(htmlstr);
-
-            if (index === -1 || parent.childNodes.length <= index) {
-                parent.appendChild(element);
-            } else {
-                parent.insertBefore(element, parent.childNodes[index]);
+        iframe.addEventListener('load', function() {
+            const iframeTitle = iframe.contentDocument.title;
+            if (iframeTitle) {
+                document.title = iframeTitle;
             }
-        }
 
-        function parseHtml(htmlstr) {
-            const template = document.createElement('template');
-            template.innerHTML = htmlstr;
-            return template.content;
-        }
+            // IFrame MutationObserver
+            const titleObserver = new MutationObserver(function() {
+                document.title = iframe.contentDocument.title;
+            });
 
-        // Create Shadow DOM
-        const container = document.getElementById('footer-container');
-        const shadow = container.attachShadow({mode: 'open'});
+            // Observe IFrame Title
+            if (iframe.contentDocument.querySelector('title')) {
+                titleObserver.observe(iframe.contentDocument.querySelector('title'), {
+                    subtree: true,
+                    characterData: true,
+                    childList: true
+                });
+            }
 
-        // Edit Shadow DOM InnerHTML
-        // -- Required to copy and paste from bootstrap definition of root selector host style
-        shadow.innerHTML = `
-            <style>
-                :host {
-                    --bs-dark-rgb: 33, 37, 41;
-                    --bs-text-opacity: 1;
-                    --bs-secondary-color: rgba(33, 37, 41, 0.75);
-                }
-
-                .online-judge-page-footer-container {
-                    background: #7d8592 !important;
-                }
-
-                .online-judge-page-footer {
-                    fill: #7d8592 !important;
-                }
-
-                .online-judge-page-footer text {
-                    color: #7d8592 !important;
-                }
-            </style>
-            <link href="/cdn/bootstrap/5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
-            <link href="/dist/res/css/style.css" rel="stylesheet">
-            <link href="/dist/res/css/color.css" rel="stylesheet">
-        `;
-        const currentYear = new Date().getFullYear();
-        const templatePath = "footer.html";
-        const result = await fetch("/dist/res/templates/" + templatePath);
-        const templateText = await result.text();
-        insertElement(templateText, shadow, -1);
-
-        // Remove Back to Top Button from Footer (Use Judge's Back to Top Button instead)
-        shadow.getElementById('btn-back-to-top').remove();
-        shadow.getElementById('footer').classList.add('online-judge-page-footer-container');
-        shadow.getElementById('footer').getElementsByClassName('bi-discord')[0].classList.add('online-judge-page-footer');
+            // URL Sync
+            const iframeLocation = iframe.contentWindow.location;
+            if (iframeLocation.href !== window.location.href) {
+                history.replaceState(null, document.title, iframeLocation.pathname + iframeLocation.search + iframeLocation.hash);
+            }
+            iframe.contentWindow.addEventListener('popstate', function() {
+                history.replaceState(null, iframe.contentDocument.title,
+                    iframe.contentWindow.location.pathname +
+                    iframe.contentWindow.location.search +
+                    iframe.contentWindow.location.hash);
+            });
+        });
     </script>
 </body>
 </html>
