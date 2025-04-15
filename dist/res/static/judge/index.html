@@ -25,7 +25,7 @@
             height: 100%;
             overflow: hidden;
         }
-        #frame-container {
+        #judge_iframe {
             width: 100%;
             height: 100vh;
             border: none;
@@ -33,9 +33,14 @@
     </style>
 </head>
 <body>
-    <iframe id="frame-container" src="https://dAiv-CNU.duckdns.org/judge/index.html" sandbox="allow-same-origin allow-scripts allow-popups allow-forms"></iframe>
+    <section id="judge">
+        <iframe id="judge_iframe" src="https://dAiv-CNU.duckdns.org/judge/index.html"
+                sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+                root_url="https://dAiv-CNU.duckdns.org/judge">
+        </iframe>
+    </section>
     <script>
-        const iframe = document.getElementById('frame-container');
+        const iframe = document.getElementById('judge_iframe');
 
         iframe.addEventListener('load', function() {
             const iframeTitle = iframe.contentDocument.title;
