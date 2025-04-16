@@ -50,7 +50,7 @@
             if (newPath !== currentPath) {
                 console.log('Path changed from: ', currentPath, ' to: ', newPath);
                 currentPath = newPath;
-                //history.back();
+                history.back();
             }
         });
 
@@ -68,7 +68,7 @@
                     if (event.data.url) {
                         let url = event.data.url.replace(baseUrl, '');
                         if (url !== window.location.pathname) {
-                            window.history.replaceState(null, event.data.title, url);
+                            window.history.pushState(null, event.data.title, url);
                             currentPath = url;
                         }
                     }
