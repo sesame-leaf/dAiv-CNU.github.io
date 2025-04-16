@@ -43,6 +43,11 @@
     <script>
         window.addEventListener('message', function(event) {
             if (event.origin === 'https://daiv-cnu.duckdns.org') {
+                if (event.data.type === 'domain-change-attempt') {
+                    if (event.data.url) {
+                        window.location.replace(event.data.url);
+                    }
+                }
                 if (event.data.type === 'page-info') {
                     if (event.data.url) {
                         let url = event.data.url.replace('https://daiv-cnu.duckdns.org', '');
@@ -52,11 +57,6 @@
                     }
                     if (event.data.title) {
                         document.title = event.data.title;
-                    }
-                }
-                if (event.data.type === 'domain-change-attempt') {
-                    if (event.data.url) {
-                        window.location.replace(event.data.url);
                     }
                 }
             }
