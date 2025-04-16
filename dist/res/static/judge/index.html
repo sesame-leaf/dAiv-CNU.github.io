@@ -32,7 +32,7 @@
     <script>
         const redirectPath = sessionStorage.getItem('redirect-path');
         const iframe = document.getElementById('judge_iframe');
-        if (redirectPath) {  // if page is refreshed
+        if (redirectPath && redirectPath !== "undefined") {  // if page is refreshed
             sessionStorage.removeItem('redirect-path');  // pull out the value
             // URL update without page refresh using History API
             window.history.replaceState(null, null, redirectPath);
@@ -45,7 +45,7 @@
             if (event.origin !== 'https://daiv-cnu.duckdns.org') {
                 if (event.origin === 'https://daiv-cnu.github.io') {
                     console.log('Redirecting to', event.data.url);
-                    window.location.href = event.data.url;
+                    //window.location.href = event.data.url;
                 }
                 return;
             }
