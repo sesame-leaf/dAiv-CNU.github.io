@@ -42,7 +42,7 @@
 
     <script>
         window.addEventListener('message', function(event) {
-            if (event.origin !== 'https://daiv-cnu.duckdns.org') {
+            if (event.origin === 'https://daiv-cnu.duckdns.org') {
                 if (event.data.type === 'page-info') {
                     if (event.data.url) {
                         let url = event.data.url.replace('https://daiv-cnu.duckdns.org', '');
