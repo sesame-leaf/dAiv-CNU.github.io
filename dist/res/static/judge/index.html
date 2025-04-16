@@ -45,8 +45,10 @@
 
         window.addEventListener('popstate', function(event) {
             const newPath = window.location.pathname;
+            console.log(newPath);
 
             if (newPath !== currentPath) {
+                console.log('Path changed from: ', currentPath, ' to: ', newPath);
                 currentPath = newPath;
                 iframe.src = baseUrl + newPath;
 
@@ -66,6 +68,7 @@
                         let url = event.data.url.replace(baseUrl, '');
                         if (url !== window.location.pathname) {
                             window.history.pushState({}, '', url);
+                            currentPath = url;
                         }
                     }
                     if (event.data.title) {
