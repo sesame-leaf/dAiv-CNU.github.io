@@ -43,6 +43,10 @@
     <script>
         window.addEventListener('message', function(event) {
             if (event.origin !== 'https://daiv-cnu.duckdns.org') {
+                if (event.origin === 'https://daiv-cnu.github.io') {
+                    console.log('Redirecting to', event.data.url);
+                    window.location.href = event.data.url;
+                }
                 return;
             }
 
