@@ -54,7 +54,6 @@
                         document.title = event.data.title;
                     }
                 }
-            } else {
                 if (event.data.type === 'domain-change-attempt') {
                     if (event.data.url) {
                         window.location.replace(event.data.url);
