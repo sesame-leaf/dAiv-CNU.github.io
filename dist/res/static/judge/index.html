@@ -48,9 +48,8 @@
 
             if (event.data.type === 'page-info') {
                 if (event.data.url) {
-                    window.history.replaceState(null, null, event.data.url);
+                    window.history.replaceState(null, null, event.data.url.replace('https://daiv-cnu.duckdns.org', ''));
                 }
-                
                 if (event.data.title) {
                     document.title = event.data.title;
                 }
