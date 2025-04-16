@@ -43,14 +43,17 @@
     <script>
         window.addEventListener('message', function(event) {
             if (event.origin !== 'https://daiv-cnu.duckdns.org') {
+                if (event.origin === 'https://daiv-cnu.github.io') {
+                    console.log('Redirecting to', event.data.url);
+                    window.location.href = event.data.url;
+                }
                 return;
             }
 
             if (event.data.type === 'page-info') {
                 if (event.data.url) {
-                    window.history.replaceState(null, null, event.data.url);
+                    window.history.replaceState(null, null, event.data.url.replace('https://daiv-cnu.duckdns.org', ''));
                 }
-                
                 if (event.data.title) {
                     document.title = event.data.title;
                 }
