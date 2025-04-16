@@ -8,16 +8,6 @@
 
     <title>OnlineJudge</title>
     <link rel="shortcut icon" href="/dist/res/image/favicon.ico">
-
-    <script>
-        const redirectPath = sessionStorage.getItem('redirect-path');
-        if (redirectPath) {  // if page is refreshed
-            sessionStorage.removeItem('redirect-path');  // pull out the value
-            // URL update without page refresh using History API
-            window.history.replaceState(null, null, redirectPath);
-        }
-    </script>
-
     <style>
         html, body {
             margin: 0;
@@ -34,45 +24,37 @@
 </head>
 <body>
     <section id="judge">
-        <iframe id="judge_iframe" src="https://dAiv-CNU.duckdns.org/judge/index.html"
-                sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
-                root_url="https://dAiv-CNU.duckdns.org/judge">
+        <iframe id="judge_iframe" src="https://daiv-cnu.duckdns.org/judge/" allow="web-share"
+                root_url="https://daiv-cnu.duckdns.org/judge">
         </iframe>
     </section>
+
     <script>
+        const redirectPath = sessionStorage.getItem('redirect-path');
         const iframe = document.getElementById('judge_iframe');
+        if (redirectPath) {  // if page is refreshed
+            sessionStorage.removeItem('redirect-path');  // pull out the value
+            // URL update without page refresh using History API
+            window.history.replaceState(null, null, redirectPath);
+            iframe.src = 'https://daiv-cnu.duckdns.org' + redirectPath;
+        }
+    </script>
 
-        iframe.addEventListener('load', function() {
-            const iframeTitle = iframe.contentDocument.title;
-            if (iframeTitle) {
-                document.title = iframeTitle;
+    <script>
+        window.addEventListener('message', function(event) {
+            if (event.origin !== 'https://daiv-cnu.duckdns.org') {
+                return;
             }
 
-            // IFrame MutationObserver
-            const titleObserver = new MutationObserver(function() {
-                document.title = iframe.contentDocument.title;
-            });
-
-            // Observe IFrame Title
-            if (iframe.contentDocument.querySelector('title')) {
-                titleObserver.observe(iframe.contentDocument.querySelector('title'), {
-                    subtree: true,
-                    characterData: true,
-                    childList: true
-                });
+            if (event.data.type === 'page-info') {
+                if (event.data.url) {
+                    window.history.replaceState(null, null, event.data.url);
+                }
+                
+                if (event.data.title) {
+                    document.title = event.data.title;
+                }
             }
-
-            // URL Sync
-            const iframeLocation = iframe.contentWindow.location;
-            if (iframeLocation.href !== window.location.href) {
-                history.replaceState(null, document.title, iframeLocation.pathname + iframeLocation.search + iframeLocation.hash);
-            }
-            iframe.contentWindow.addEventListener('popstate', function() {
-                history.replaceState(null, iframe.contentDocument.title,
-                    iframe.contentWindow.location.pathname +
-                    iframe.contentWindow.location.search +
-                    iframe.contentWindow.location.hash);
-            });
         });
     </script>
 </body>
