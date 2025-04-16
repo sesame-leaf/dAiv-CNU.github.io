@@ -45,14 +45,17 @@
             if (event.origin !== 'https://daiv-cnu.duckdns.org') {
                 if (event.data.type === 'page-info') {
                     if (event.data.url) {
-                        window.history.replaceState(null, null, event.data.url.replace('https://daiv-cnu.duckdns.org', ''));
+                        let url = event.data.url.replace('https://daiv-cnu.duckdns.org', '');
+                        if (url !== window.location.pathname) {
+                            window.history.pushState({}, '', url);
+                        }
                     }
                     if (event.data.title) {
                         document.title = event.data.title;
                     }
                 }
-            } else if (event.origin === 'https://daiv-cnu.github.io') {
-                if (event.data.type === 'page-info') {
+            } else {
+                if (event.data.type === 'domain-change-attempt') {
                     if (event.data.url) {
                         window.location.replace(event.data.url);
                     }
