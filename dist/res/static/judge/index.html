@@ -45,7 +45,7 @@
             if (event.origin === 'https://daiv-cnu.duckdns.org') {
                 if (event.data.type === 'domain-change-attempt') {
                     if (event.data.url) {
-                        window.location.replace(event.data.url);
+                        window.location.href = event.data.url;
                     }
                 }
                 if (event.data.type === 'page-info') {
