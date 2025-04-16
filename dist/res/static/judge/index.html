@@ -32,17 +32,30 @@
     <script>
         const redirectPath = sessionStorage.getItem('redirect-path');
         const iframe = document.getElementById('judge_iframe');
+        const baseUrl = 'https://daiv-cnu.duckdns.org';
+
         if (redirectPath) {  // if page is refreshed
             sessionStorage.removeItem('redirect-path');  // pull out the value
             // URL update without page refresh using History API
             window.history.replaceState(null, null, redirectPath);
-            iframe.src = 'https://daiv-cnu.duckdns.org' + redirectPath;
+            iframe.src = baseUrl + redirectPath;
         }
-    </script>
 
-    <script>
+        let currentPath = window.location.pathname;
+
+        window.addEventListener('popstate', function(event) {
+            const newPath = window.location.pathname;
+
+            if (newPath !== currentPath) {
+                currentPath = newPath;
+                iframe.src = baseUrl + newPath;
+
+                //sessionStorage.setItem('redirect-path', newPath);
+            }
+        });
+
         window.addEventListener('message', function(event) {
-            if (event.origin === 'https://daiv-cnu.duckdns.org') {
+            if (event.origin === baseUrl) {
                 if (event.data.type === 'domain-change-attempt') {
                     if (event.data.url) {
                         window.location.href = event.data.url;
@@ -50,7 +63,7 @@
                 }
                 if (event.data.type === 'page-info') {
                     if (event.data.url) {
-                        let url = event.data.url.replace('https://daiv-cnu.duckdns.org', '');
+                        let url = event.data.url.replace(baseUrl, '');
                         if (url !== window.location.pathname) {
                             window.history.pushState({}, '', url);
                         }
