@@ -41,6 +41,19 @@
             iframe.src = baseUrl + redirectPath;
         }
 
+        let currentPath = window.location.pathname;
+
+        window.addEventListener('popstate', function(event) {
+            const newPath = window.location.pathname;
+            console.log(newPath);
+
+            if (newPath !== currentPath) {
+                console.log('Path changed from: ', currentPath, ' to: ', newPath);
+                currentPath = newPath;
+                //history.back();
+            }
+        });
+
         window.addEventListener('message', function(event) {
             if (event.origin === baseUrl) {
                 if (event.data.type === 'domain-change-attempt') {
@@ -49,10 +62,14 @@
                     }
                 }
                 if (event.data.type === 'page-info') {
+                    if (event.data.title) {
+                        document.title = event.data.title;
+                    }
                     if (event.data.url) {
                         let url = event.data.url.replace(baseUrl, '');
                         if (url !== window.location.pathname) {
-                            window.history.pushState(null, event.data.title, url);
+                            window.history.replaceState(null, event.data.title, url);
+                            currentPath = url;
                         }
                     }
                 }
