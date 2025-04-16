@@ -50,9 +50,7 @@
             if (newPath !== currentPath) {
                 console.log('Path changed from: ', currentPath, ' to: ', newPath);
                 currentPath = newPath;
-                iframe.src = baseUrl + newPath;
-
-                //sessionStorage.setItem('redirect-path', newPath);
+                history.back();
             }
         });
 
