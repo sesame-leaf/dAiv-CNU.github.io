@@ -187,9 +187,8 @@
 }
 
 #winnerpodium .background-container {
-    width: 100%;
+    width: 100vw;
     height: 840px;
-    display: block;
 }
 
 #winnerpodium .foreground-wrapper {
