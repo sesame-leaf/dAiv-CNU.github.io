@@ -63,13 +63,25 @@ if team:
             result = await window.fetch(f"/dist/res/templates/years/{year}/team.html")
             if result.status != 200:
                 continue
+
+            # 각 연도별 HTML을 삽입하기 전에 기존 요소가 있는지 확인
+            existing_element = document.getElementById(f'team_{year}')
+            if existing_element:
+                existing_element.remove()
+
             insert_element(await result.text(), team.getElementsByClassName("container")[0], -1)
             enabled_years.append(year)
 
             if len(enabled_years) == 1:
                 document.getElementById('team_'+str(year)).style.display = 'block'
-                window.AOS.init()
-                window.AOS.refresh()
+
+            # 각 연도별 데이터가 로드된 후 AOS 초기화 및 새로고침
+            window.AOS.init()
+            window.AOS.refresh()
+
+            # 애니메이션 업데이트를 위한 추가 지연 새로고침
+            await aio.sleep(0.1)
+            window.AOS.refresh()
 
             button = document.createElement("a")
             button.id = f"member_show_button_{year}"
@@ -81,9 +93,10 @@ if team:
 
             button_click_handler = f"""
                 document.querySelectorAll('[id^="team_"]').forEach(el => el.style.display = 'none');
-                document.getElementById('team_{year}').style.display = 'block'
+                document.getElementById('team_{year}').style.display = 'block';
+                window.AOS.refresh(); // 연도 변경 시 AOS 새로고침 추가
             """
-            button.setAttribute('onclick', button_click_handler)
+            button.setAttribute("onclick", button_click_handler)
 
             document.getElementById('button_container').prepend(button)
 
