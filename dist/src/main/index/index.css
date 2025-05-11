@@ -230,6 +230,16 @@
     margin-bottom: 30px;
 }
 
+#team .selector-container {
+    text-align: center;
+}
+
+#team .selector {
+    margin: 0 8px 8px;
+    padding: 6px 12px;
+    color: #fff;
+}
+
 #team .member {
     text-align: center;
     background: #fff;
@@ -337,6 +347,16 @@
     right: 0;
     bottom: 0;
     margin: auto;
+}
+
+#programs .selector-container {
+    text-align: center;
+}
+
+#programs .selector {
+    margin: 0 8px 8px;
+    padding: 6px 12px;
+    color: #fff;
 }
 
 #programs .program-type-list {
