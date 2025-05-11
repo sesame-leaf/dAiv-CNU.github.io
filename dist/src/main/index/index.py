@@ -53,52 +53,171 @@ def setup_programs_filter():
 ########################################################################################################################
 from common.main import current_year, insert_element
 
-#test_func = lambda e: print(e.target.text)
+
+def change_year_visibility(e):
+    data_type, year = e.currentTarget.id.split("_selector_")
+    for el in document.querySelectorAll(f'[id^="{data_type}_"]'):
+        if "_selector_" in el.id:
+            continue  # skip selector elements
+        if not el.classList.contains('d-none'):
+            el.classList.add('d-none')
+    document.getElementById(f'{data_type}_'+str(year)).classList.remove('d-none')
+    adjust_selector_visibility(year, data_type)
+    window.AOS.init()
+    window.AOS.refresh()
+    if data_type == "programs":
+        setup_programs_filter()
+
+
+def flip_year_visibility(e):
+    target = e.currentTarget
+    data_type, _ = target.id.split("_selector_")
+    is_flipped = target.classList.contains('flipped')
+    fade_ins, fade_outs = [], []
+    for el in document.querySelectorAll(f'[id^="{data_type}_selector_"]'):
+        if el.id == target.id:
+            continue
+        if not el.classList.contains('visible'):
+            if is_flipped:
+                fade_outs.append(el)
+            else:
+                fade_ins.append(el)
+    aio.run(selector_animation(fade_outs, fade_ins))
+    if is_flipped:
+        target.classList.remove('flipped')
+    else:
+        target.classList.add('flipped')
+    msg = target.textContent
+    target.textContent = target.dataset.pressedStr
+    target.dataset.pressedStr = msg
+
+
+async def selector_animation(fade_outs, fade_ins):
+    size_fade_ins = [[] for _ in range(len(fade_ins))]
+    size_fade_outs = [[] for _ in range(len(fade_outs))]
+    for el, sz in zip(fade_ins, size_fade_ins):
+        sz.append(float(window.getComputedStyle(el).opacity))
+        el.style.opacity = "0"
+        el.classList.remove('d-none')
+        sz.append(el.getBoundingClientRect().width)
+        sz.append(el.getBoundingClientRect().height)
+        sz.append(float(window.getComputedStyle(el).fontSize.split('px')[0]))
+        el.style.width = "0"
+        el.style.height = "0"
+        el.style.fontSize = "0px"
+
+    for el, sz in zip(fade_outs, size_fade_outs):
+        sz.append(float(window.getComputedStyle(el).opacity))
+        sz.append(el.getBoundingClientRect().width)
+        sz.append(el.getBoundingClientRect().height)
+        sz.append(float(window.getComputedStyle(el).fontSize.split('px')[0]))
+
+    for progress in range(100):
+        value = progress / 100
+        de_value = 1 - value
+        for el, sz in zip(fade_ins, size_fade_ins):
+            el.style.opacity = f"{sz[0]*value}"
+            el.style.width = f"{sz[1]*value}px"
+            el.style.height = f"{sz[2]*value}px"
+            el.style.fontSize = f"{sz[3]*value*value}px"
+        for el, sz in zip(fade_outs, size_fade_outs):
+            el.style.opacity = f"{sz[0]*de_value}"
+            el.style.width = f"{sz[1]*de_value}px"
+            el.style.height = f"{sz[2]*de_value}px"
+            el.style.fontSize = f"{sz[3]*de_value*de_value}px"
+        await aio.sleep(0.00001)
+
+    for el, sz in zip(fade_outs, size_fade_outs):
+        el.classList.add('d-none')
+        el.style.opacity = f"{sz[0]}"
+        el.style.width = f"{sz[1]}px"
+        el.style.height = f"{sz[2]}px"
+        el.style.fontSize = f"{sz[3]}px"
+    
+    for el, sz in zip(fade_ins, size_fade_ins):
+        el.style.opacity = f"{sz[0]}"
+        el.style.width = f"{sz[1]}px"
+        el.style.height = f"{sz[2]}px"
+        el.style.fontSize = f"{sz[3]}px"
+
+
+def adjust_selector_visibility(selected_year, data_type):
+    all_selector = document.getElementById(f'{data_type}_selector_all')
+    selected_selector = document.getElementById(f'{data_type}_selector_{selected_year}')
+    is_flipped = all_selector.classList.contains('flipped')
+    selectors = all_selector.parentNode.children
+    selected_idx = selectors.index(selected_selector)
+    selector_count = len(selectors) - 2
+    
+    # disable all selectors
+    de_selection_list = []
+    for el in selectors:
+        if el.id == f"{data_type}_selector_all":
+            continue  # skip the "all" selector
+        if el.classList.contains('visible'):
+            if not is_flipped:
+                de_selection_list.append(el)
+            el.classList.remove('visible')
+
+    # enable the selected selector
+    if not is_flipped:
+        selected_selector.classList.remove('d-none')
+    selected_selector.classList.add('visible')
+    selection_list = []
+    if selected_idx == 0:
+        selection_list = [selectors[1], selectors[2]]
+    elif selected_idx == selector_count:
+        selection_list = [selectors[selected_idx-2], selectors[selected_idx-1]]
+    else:
+        selection_list = [selectors[selected_idx-1], selectors[selected_idx+1]]
+    for el in selection_list:
+        el.classList.add('visible')
+
+    if not is_flipped:
+        fade_outs = [el for el in de_selection_list if el not in selection_list and el != selected_selector]
+        fade_ins = [el for el in selection_list if el not in de_selection_list and el != selected_selector]
+        aio.run(selector_animation(fade_outs, fade_ins))
+
+
+def register_selector(container, year, data_type, color_scheme, visible, enabled):
+    selector = document.createElement("a")
+    selector.id = f"{data_type}_selector_{year}"
+    selector.href = f"#{data_type}"
+    selector.className = f"selector btn {color_scheme} rounded-pill scrollto"
+    if visible:
+        selector.classList.add('visible')
+    else:
+        selector.classList.add('d-none')
+    if not enabled:
+        selector.classList.add('disabled')
+    selector.textContent = str(year)
+    selector.onclick = change_year_visibility
+    container.prepend(selector)
+
 
 team = document.getElementById('team')
 if team:
     async def add_team_history():
-        enabled_years = []
-        for year in range(current_year + 1, 2021, -1):
+        enabled = False
+        container = team.getElementsByClassName('container')[0]
+        selector_container = team.getElementsByClassName('selector-container')[0]
+
+        document.getElementById('team_selector_all').onclick = flip_year_visibility
+
+        for idx, year in enumerate(range(current_year+1, 2021, -1)):
             result = await window.fetch(f"/dist/res/templates/years/{year}/team.html")
-            if result.status != 200:
-                continue
+            exists = result.status == 200
 
-            # 각 연도별 HTML을 삽입하기 전에 기존 요소가 있는지 확인
-            existing_element = document.getElementById(f'team_{year}')
-            if existing_element:
-                existing_element.remove()
+            if exists:
+                insert_element(await result.text(), container, -1)
 
-            insert_element(await result.text(), team.getElementsByClassName("container")[0], -1)
-            enabled_years.append(year)
+                if not enabled:  # show only the first queried year
+                    enabled = True
+                    document.getElementById('team_'+str(year)).classList.remove('d-none')
+                    window.AOS.init()
+                    window.AOS.refresh()
 
-            if len(enabled_years) == 1:
-                document.getElementById('team_'+str(year)).style.display = 'block'
-
-            # 각 연도별 데이터가 로드된 후 AOS 초기화 및 새로고침
-            window.AOS.init()
-            window.AOS.refresh()
-
-            # 애니메이션 업데이트를 위한 추가 지연 새로고침
-            await aio.sleep(0.1)
-            window.AOS.refresh()
-
-            button = document.createElement("a")
-            button.id = f"member_show_button_{year}"
-            button.href = "#team"
-            button.className = "btn btn-warning rounded-pill scrollto cursor-hover-item"
-            button.style.display = "none" if len(enabled_years) > 3 else "block"
-            button.style.color = "white"
-            button.textContent = str(year)
-
-            button_click_handler = f"""
-                document.querySelectorAll('[id^="team_"]').forEach(el => el.style.display = 'none');
-                document.getElementById('team_{year}').style.display = 'block';
-                window.AOS.refresh(); // 연도 변경 시 AOS 새로고침 추가
-            """
-            button.setAttribute("onclick", button_click_handler)
-
-            document.getElementById('button_container').prepend(button)
+            register_selector(selector_container, year, "team", "btn-warning", idx < 3, exists)
 
     aio.run(add_team_history())
 
@@ -107,23 +226,33 @@ programs = document.getElementById('programs')
 if programs:
     async def add_programs_history():
         enabled = False
-        for year in range(current_year, 2022, -1):
+        container = programs.getElementsByClassName('container')[0]
+        selector_container = programs.getElementsByClassName('selector-container')[0]
+
+        document.getElementById('programs_selector_all').onclick = flip_year_visibility
+
+        for idx, year in enumerate(range(current_year+1, 2021, -1)):
             result = await window.fetch(f"/dist/res/templates/years/{year}/programs.html")
-            if result.status != 200:
-                continue
-            insert_element(await result.text(), programs.getElementsByClassName("container")[0], -1)
-            if not enabled:
-                enabled = True
-                document.getElementById('programs_'+str(year)).style.display = 'block'
-                images = document.select('img')
+            exists = result.status == 200
 
-                for img in images:
-                    if not img.complete:
-                        images.append(img)
-                    await aio.sleep(0.001)
+            if exists:
+                insert_element(await result.text(), container, -1)
 
-                window.AOS.init()
-                window.AOS.refresh()
-                setup_programs_filter()
+                if not enabled:  # show only the first queried year
+                    enabled = True
+                    document.getElementById('programs_'+str(year)).classList.remove('d-none')
+                    images = document.select('img')
+
+                    for img in images:
+                        if not img.complete:
+                            images.append(img)
+                        await aio.sleep(0.001)
+
+                    window.AOS.init()
+                    window.AOS.refresh()
+                    setup_programs_filter()
+
+            #register_selector(selector_container, year, "programs", "btn-success", idx < 3, exists)
+            #TODO: Fix the selector visibility
 
     aio.run(add_programs_history())
