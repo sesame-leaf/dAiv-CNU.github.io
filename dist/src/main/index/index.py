@@ -51,7 +51,7 @@ def setup_programs_filter():
 ########################################################################################################################
 # Set Datas by Year
 ########################################################################################################################
-from common.main import current_year, insert_element
+from common.main import current_year, insert_element, scroll_to
 
 
 def change_year_visibility(e):
@@ -214,6 +214,7 @@ if team:
                 if not enabled:  # show only the first queried year
                     enabled = True
                     document.getElementById('team_'+str(year)).classList.remove('d-none')
+                    scroll_to(window.location.hash)
                     window.AOS.init()
                     window.AOS.refresh()
 
@@ -248,6 +249,7 @@ if programs:
                             images.append(img)
                         await aio.sleep(0.001)
 
+                    scroll_to(window.location.hash)
                     window.AOS.init()
                     window.AOS.refresh()
                     setup_programs_filter()

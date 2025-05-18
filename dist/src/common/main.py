@@ -37,20 +37,20 @@ def parse_html(htmlstr: str):
 ########################################################################################################################
 # Navigation Bar
 ########################################################################################################################
+def scroll_to(section: str):
+    offset = document.getElementById('header').offsetHeight
+    if section:
+        section_element = document.getElementById(section.split('#')[-1])
+        if section_element:
+            pos = document.getElementById(section.split('#')[-1]).offsetTop
+            window.scrollTo({'top': pos - offset, 'behavior': "smooth"})
+
 def enable_navigation():
     navigation = document.getElementsByClassName('nav-link')
     navigation_menus = {nav.attributes['href'].value.split('#')[-1]: nav for nav in navigation}
     header = document.getElementById('header')
     navbar = document.getElementById('navbar')
     mobile_toggles = document.getElementsByClassName('mobile-nav-toggle')
-
-    def scroll_to(section: str):
-        offset = header.offsetHeight
-        if section:
-            section_element = document.getElementById(section.split('#')[-1])
-            if section_element:
-                pos = document.getElementById(section.split('#')[-1]).offsetTop
-                window.scrollTo({'top': pos - offset, 'behavior': "smooth"})
 
     def navbar_click(event):
         # fix default location error
